@@ -3,12 +3,16 @@ import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import LoginForm from "./components/LoginForm";
 import loginService from "./services/login";
+import NewBlogForm from "./components/NewBlogForm";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
+  const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
+  const [url, setUrl] = useState("");
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedUser");
@@ -26,7 +30,7 @@ const App = () => {
     setBlogs(blogs);
   };
 
-  // handlers
+  // handlers login inputs
 
   const handleInputLoginUser = (e) => {
     setUsername(e.target.value);
@@ -36,6 +40,20 @@ const App = () => {
     setPassword(e.target.value);
   };
 
+  // handlers blogs inputs
+
+  const handleInputBlogTitle = (e) => {
+    setTitle(e.target.value);
+  };
+
+  const handleInputBlogAuthor = (e) => {
+    setAuthor(e.target.value);
+  };
+
+  const handleInputBlogUrl = (e) => {
+    setUrl(e.target.value);
+  };
+
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
 
@@ -43,7 +61,7 @@ const App = () => {
       const user = await loginService.login({ username, password });
       window.localStorage.setItem("loggedUser", JSON.stringify(user));
       blogService.setToken(user.token);
-      setUser(user); //get token
+      setUser(user); //user = token, username, name
       setPassword("");
       getData();
     } catch (exception) {
@@ -55,6 +73,20 @@ const App = () => {
   const logOut = () => {
     window.localStorage.removeItem("loggedUser");
     setUser(null);
+  };
+
+  const handleBlogSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const newBlog = await blogService.create({ title, author, url });
+      setBlogs(blogs.concat(newBlog));
+      setTitle("");
+      setAuthor("");
+      setUrl("");
+    } catch (exception) {
+      console.log(exception);
+    }
   };
 
   return (
@@ -77,6 +109,16 @@ const App = () => {
 
           {`${username} logged in `}
           <button onClick={logOut}>Logout</button>
+
+          <NewBlogForm
+            title={title}
+            handleTitle={handleInputBlogTitle}
+            author={author}
+            handleAuthor={handleInputBlogAuthor}
+            url={url}
+            handleUrl={handleInputBlogUrl}
+            handleSubmit={handleBlogSubmit}
+          />
 
           <br />
           <br />
