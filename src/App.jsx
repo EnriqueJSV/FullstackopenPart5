@@ -4,15 +4,22 @@ import blogService from "./services/blogs";
 import LoginForm from "./components/LoginForm";
 import loginService from "./services/login";
 import NewBlogForm from "./components/NewBlogForm";
+import Notification from "./components/Notification";
 
 const App = () => {
+  // blogs
   const [blogs, setBlogs] = useState([]);
+  // login
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
+  // blogs post
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
+  // notification
+  const [notification, setNotification] = useState(null);
+  const [notifType, setNotifType] = useState("notification");
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedUser");
@@ -66,7 +73,11 @@ const App = () => {
       getData();
     } catch (exception) {
       setPassword("");
-      console.log("Wrong credentials");
+      setNotifType("error");
+      setNotification("Wrong credentials");
+      setTimeout(() => {
+        setNotification(null);
+      }, 5000);
     }
   };
 
@@ -84,6 +95,13 @@ const App = () => {
       setTitle("");
       setAuthor("");
       setUrl("");
+      setNotifType("notification");
+      setNotification(
+        `a new blog "${newBlog.title}" by ${newBlog.author} added`
+      );
+      setTimeout(() => {
+        setNotification(null);
+      }, 5000);
     } catch (exception) {
       console.log(exception);
     }
@@ -94,6 +112,8 @@ const App = () => {
       {user === null ? (
         <>
           <h2>Login</h2>
+
+          <Notification message={notification} notifType={notifType} />
 
           <LoginForm
             user={username}
@@ -106,6 +126,8 @@ const App = () => {
       ) : (
         <>
           <h2>blogs</h2>
+
+          <Notification message={notification} notifType={notifType} />
 
           {`${username} logged in `}
           <button onClick={logOut}>Logout</button>
