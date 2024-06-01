@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import LoginForm from "./components/LoginForm";
@@ -14,10 +14,7 @@ const App = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
-  // blogs post
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
+
   // notification
   const [notification, setNotification] = useState(null);
   const [notifType, setNotifType] = useState("notification");
@@ -48,20 +45,6 @@ const App = () => {
     setPassword(e.target.value);
   };
 
-  // handlers blogs inputs
-
-  const handleInputBlogTitle = (e) => {
-    setTitle(e.target.value);
-  };
-
-  const handleInputBlogAuthor = (e) => {
-    setAuthor(e.target.value);
-  };
-
-  const handleInputBlogUrl = (e) => {
-    setUrl(e.target.value);
-  };
-
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
 
@@ -87,15 +70,11 @@ const App = () => {
     setUser(null);
   };
 
-  const handleBlogSubmit = async (e) => {
-    e.preventDefault();
-
+  const addBlog = async (blogObject) => {
     try {
-      const newBlog = await blogService.create({ title, author, url });
+      const newBlog = await blogService.create(blogObject);
       setBlogs(blogs.concat(newBlog));
-      setTitle("");
-      setAuthor("");
-      setUrl("");
+      blogFormRef.current.toggleVisibility();
       setNotifType("notification");
       setNotification(
         `a new blog "${newBlog.title}" by ${newBlog.author} added`
@@ -107,6 +86,8 @@ const App = () => {
       console.log(exception);
     }
   };
+
+  const blogFormRef = useRef();
 
   return (
     <div>
@@ -133,16 +114,8 @@ const App = () => {
           {`${username} logged in `}
           <button onClick={logOut}>Logout</button>
 
-          <Togglable buttonLabel='new blog'>
-            <NewBlogForm
-              title={title}
-              handleTitle={handleInputBlogTitle}
-              author={author}
-              handleAuthor={handleInputBlogAuthor}
-              url={url}
-              handleUrl={handleInputBlogUrl}
-              handleSubmit={handleBlogSubmit}
-            />
+          <Togglable buttonLabel="new blog" ref={blogFormRef}>
+            <NewBlogForm createBlog={addBlog} />
           </Togglable>
 
           <br />
