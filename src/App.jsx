@@ -5,6 +5,7 @@ import LoginForm from "./components/LoginForm";
 import loginService from "./services/login";
 import NewBlogForm from "./components/NewBlogForm";
 import Notification from "./components/Notification";
+import Togglable from "./components/Togglable";
 
 const App = () => {
   // blogs
@@ -132,15 +133,17 @@ const App = () => {
           {`${username} logged in `}
           <button onClick={logOut}>Logout</button>
 
-          <NewBlogForm
-            title={title}
-            handleTitle={handleInputBlogTitle}
-            author={author}
-            handleAuthor={handleInputBlogAuthor}
-            url={url}
-            handleUrl={handleInputBlogUrl}
-            handleSubmit={handleBlogSubmit}
-          />
+          <Togglable buttonLabel='new blog'>
+            <NewBlogForm
+              title={title}
+              handleTitle={handleInputBlogTitle}
+              author={author}
+              handleAuthor={handleInputBlogAuthor}
+              url={url}
+              handleUrl={handleInputBlogUrl}
+              handleSubmit={handleBlogSubmit}
+            />
+          </Togglable>
 
           <br />
           <br />
